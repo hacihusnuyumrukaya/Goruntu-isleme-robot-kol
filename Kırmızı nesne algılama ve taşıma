@@ -1,0 +1,122 @@
+imaqreset;
+%haci husnu yumrukaya 201813171022
+global a;
+a = arduino('COM4');%arduinomuzun bağlı olduğu port icin
+
+servoAttach(a,11);%dönme islemlerinde kullanacagim pin
+servoAttach(a,10);% boy uzama kısalma islemlerinde kullanacagim pin
+servoAttach(a,9);%yukarı ve asagi islemlerinde kullanacagim pin
+servoAttach(a,6);%agiz kismi acilma ve kapama islemleri icin pin
+
+servoWrite(a,11,65); %ilk konum dönmede
+servoWrite(a,10,50);%kısa
+servoWrite(a,9,40);%kaldırma
+servoWrite(a,6,60);%agiz kapali
+
+pause(1);
+
+vid = videoinput('winvideo','A4tech PC Camera');%kullanılacak olan kameramız icin
+
+set(vid, 'FramesPerTrigger', Inf);% Videonun sürekli frame alması için gerekli düzeltme
+set(vid, 'ReturnedColorspace', 'rgb')% Videonun rgb uzayda dönmesi için gerekli ayarlama
+vid.FrameGrabInterval = 3; % Videodan ne kadar sıklıkla frame çekileceği.
+start(vid);%videonun baslatılmasi
+
+
+
+while(vid.FramesAcquired<=2000)%video döngüsü
+
+    data=getsnapshot(vid);% Videodan ekran görüntüsü alınması
+    diff_im = imsubtract(data(:,:,1), rgb2gray(data));% Kırmızı resim katmanından gri katmanın çıkarılması
+    diff_im1 = imsubtract(data(:,:,2), rgb2gray(data));% Yeşil resim katmanından gri katmanın çıkarılması
+    diff_im2 = imsubtract(data(:,:,3), rgb2gray(data));% Mavi resim katmanından gri katmanın çıkarılması
+    
+    diff_im = medfilt2(diff_im, [3 3]);%Kırmızı resim algılanmasında medyan filtreleme işlemi
+    diff_im1 = medfilt2(diff_im1, [3 3]);%Yeşil resim algılanmasında medyan filtreleme işlemi
+    diff_im2 = medfilt2(diff_im2, [3 3]);%Mavi resim algılanmasında medyan filtreleme işlemi
+    
+    diff_im = im2bw(diff_im,0.3);%Belirlenen cisme göre ikili görüntülere dönüstürme islemleri
+    diff_im1 = im2bw(diff_im1,0.1);
+    diff_im2 = im2bw(diff_im2,0.3);
+     
+    diff_im = bwareaopen(diff_im,200);%200 pixelden az olan kısımların ortadan kaldırılıp algılamanın kolaylastirilmasi saglandi
+    diff_im1 = bwareaopen(diff_im1,200);%yani kücük objelerin algilanmasi icin
+    diff_im2 = bwareaopen(diff_im2,200);
+    
+    bw = bwlabel(diff_im, 4);% 4 Komşuluğuna göre bağlı bileşenlerin bulunması
+    bw1 = bwlabel(diff_im1, 4);
+    bw2 = bwlabel(diff_im2, 4);
+
+imshow(data,'Border','tight','InitialMagnification', 255);
+hold on
+toplam=sum(sum(bw)); % KIRMIZI PARÇAYI ALGILADIĞINDA GERÇEKLEŞECEK İŞLEMLER
+if (toplam>20)
+    pause(1);
+    
+servoAttach(a,11);%dönme islemlerinde kullanacagim pin
+servoAttach(a,10);% boy uzama kısalma islemlerinde kullanacagim pin
+servoAttach(a,9);%yukarı ve asagi islemlerinde kullanacagim pin
+servoAttach(a,6);%agiz kismi acilma ve kapama islemleri icin pin
+
+servoWrite(a,11,65); %ilk konum dönmede
+servoWrite(a,10,50);%kısa
+servoWrite(a,9,40);%kaldırma
+servoWrite(a,6,15);%agiz acildi
+
+pause(3);
+
+b=0.0125;
+for i=40:120
+   servoWrite(a,9,i); % eğilme
+   pause(b);
+end
+for i=15:45
+  servoWrite(a,6,i); % ağız kapanma
+  pause(0.1);
+end 
+for i=120: -1: 40   % kaldırma
+   servoWrite(a,9,i);
+   pause(b);
+end
+for i=65: -1 :5
+    servoWrite(a,11,i); %dön kirmizi sekil icin
+    pause(b);
+end
+for i=50:75  % uzama (kırmızı kutu)
+   servoWrite(a,10,i);
+   pause(b);
+end
+for i=40:120
+   servoWrite(a,9,i); % eğilme
+   pause(b);
+end
+for i=45:-1:15
+  servoWrite(a,6,i); % ağız kısmının açılması
+  pause(0.1);
+end 
+for i=120: -1: 40   % kaldırma
+   servoWrite(a,9,i);
+   pause(b);
+end
+for i=75: -1: 50   % kısalma (kırmızı kutu)
+   servoWrite(a,10,i);
+   pause(b);
+end
+for i=5:65
+    servoWrite(a,11,i); %dön ilk konuma 
+    pause(b);
+end
+end 
+
+        
+hold off
+        
+end
+
+
+stop(vid);%video durduruldu
+flushdata(vid);%ilk yakalama islemimizde alinan frameleri kaldirdi
+
+imaqreset;
+clc;
+clear all;
