@@ -1,8 +1,9 @@
+%-----------------------------------------------------------------
 imaqreset;
 %haci husnu yumrukaya 201813171022
 global a;
 a = arduino('COM4');%arduinomuzun bağlı olduğu port icin
-
+%-----------------------------------------------------------------
 servoAttach(a,11);%dönme islemlerinde kullanacagim pin
 servoAttach(a,10);% boy uzama kısalma islemlerinde kullanacagim pin
 servoAttach(a,9);%yukarı ve asagi islemlerinde kullanacagim pin
@@ -14,7 +15,7 @@ servoWrite(a,9,40);%kaldırma
 servoWrite(a,6,60);%agiz kapali
 
 pause(1);
-
+%-----------------------------------------------------------------
 vid = videoinput('winvideo','A4tech PC Camera');%kullanılacak olan kameramız icin
 
 set(vid, 'FramesPerTrigger', Inf);% Videonun sürekli frame alması için gerekli düzeltme
@@ -49,6 +50,7 @@ while(vid.FramesAcquired<=2000)%video döngüsü
 
 imshow(data,'Border','tight','InitialMagnification', 255);
 hold on
+%-----------------------------------------------------------------
 toplam=sum(sum(bw)); % KIRMIZI PARÇAYI ALGILADIĞINDA GERÇEKLEŞECEK İŞLEMLER
 if (toplam>20)
     pause(1);
