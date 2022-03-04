@@ -172,7 +172,6 @@ hold off
         
 end
 
-
 stop(vid);%video durduruldu
 flushdata(vid);%ilk yakalama islemimizde alinan frameleri kaldirdi
 
