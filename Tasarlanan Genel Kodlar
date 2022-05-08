@@ -24,7 +24,7 @@ vid.FrameGrabInterval = 3; % Videodan ne kadar sıklıkla frame çekileceği.
 start(vid);%videonun baslatılmasi
 
 
-%-----------------------------------------------------------------
+%----------------------------------------------------------------- 
 while(vid.FramesAcquired<=2000)%video döngüsü
 
     data=getsnapshot(vid);% Videodan ekran görüntüsü alınması
