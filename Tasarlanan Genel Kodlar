@@ -50,7 +50,7 @@ while(vid.FramesAcquired<=2000)%video döngüsü
 
 imshow(data,'Border','tight','InitialMagnification', 255);
 hold on
-%-----------------------------------------------------------------
+%----------------------------------------------------------------- 
 toplam=sum(sum(bw)); % KIRMIZI PARÇAYI ALGILADIĞIMIZDA
 if (toplam>20)
     pause(1);
